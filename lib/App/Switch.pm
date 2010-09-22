@@ -37,14 +37,14 @@ sub switch_to {
   my $time = $self->clock->time;
   my $switch_time = $self->switch_time;
   if( $name eq 'off' ) {
-    $self->accum_time->add( $time->subtract_datetime($switch_time) );
+    $self->accum_time->add( $time->delta_ms($switch_time) );
   }
   $self->switch_time( $time->clone() );
 }
 
 sub get_time_for {
   my ($self, $name, $when) = @_;
-  return sprintf("%02d:%02d", $self->accum_time->hours, $self->accum_time->minutes);
+  return sprintf("%02d:%02d", $self->accum_time->in_units('hours', 'minutes'));
 }
 
 no Moose;

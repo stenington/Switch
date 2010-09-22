@@ -63,3 +63,31 @@ use ClockMock;
   $app->switch_to("off");
   is( $app->get_time_for("foo", "today"), "00:02", "two minutes accumulated" );
 }
+
+{
+  my $app = App::Switch->new();
+  my $clock = ClockMock->new();
+  $app->set_clock($clock);
+  $app->switch_to("foo");
+  $clock->add_minutes(75);
+  $app->switch_to("off");
+  is( $app->get_time_for("foo", "today"), "01:15", "1:15 accumulated" );
+  $clock->add_minutes(10);
+  $app->switch_to("foo");
+  $clock->add_minutes(170);
+  $app->switch_to("off");
+  is( $app->get_time_for("foo", "today"), "04:05", "4:05 accumulated" );
+}
+
+{
+  $DB::single=1;
+  my $app = App::Switch->new();
+  my $clock = ClockMock->new();
+  $app->set_clock($clock);
+  $app->switch_to("foo");
+  $clock->add_minutes((24*60)+10);
+  $app->switch_to("off");
+  is( $app->get_time_for("foo", "today"), "24:10", "24:10 accumulated" );
+}
+
+
