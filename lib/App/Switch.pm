@@ -3,108 +3,50 @@ package App::Switch;
 use warnings;
 use strict;
 
-=head1 NAME
+use DateTime;
+use DateTime::Duration;
 
-App::Switch - The great new App::Switch!
+use Moose;
 
-=head1 VERSION
+has 'clock' => (
+  is => 'rw',
+  writer => 'set_clock',
+  isa => 'Clock',
+  default => sub { Clock->new() },
+);
 
-Version 0.01
+has 'switch_time' => (
+  is => 'rw',
+  isa => 'DateTime',
+);
 
-=cut
+has 'switch_name' => (
+  is => 'rw',
+  isa => 'Str',
+  default => 'off',
+);
 
-our $VERSION = '0.01';
+has 'accum_time' => (
+  is => 'rw',
+  isa => 'DateTime::Duration',
+  default => sub{ DateTime::Duration->new() },
+);
 
-
-=head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use App::Switch;
-
-    my $foo = App::Switch->new();
-    ...
-
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 SUBROUTINES/METHODS
-
-=head2 function1
-
-=cut
-
-sub function1 {
+sub switch_to {
+  my ($self, $name) = @_;
+  my $time = $self->clock->time;
+  my $switch_time = $self->switch_time;
+  if( $name eq 'off' ) {
+    $self->accum_time->add( $time->subtract_datetime($switch_time) );
+  }
+  $self->switch_time( $time->clone() );
 }
 
-=head2 function2
-
-=cut
-
-sub function2 {
+sub get_time_for {
+  my ($self, $name, $when) = @_;
+  return sprintf("%02d:%02d", $self->accum_time->hours, $self->accum_time->minutes);
 }
 
-=head1 AUTHOR
+no Moose;
 
-Mike Larsson, C<< <mikelarssonftw at gmail.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-app-switch at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Switch>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc App::Switch
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Switch>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/App-Switch>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/App-Switch>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/App-Switch/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2010 Mike Larsson.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
-
-
-=cut
-
-1; # End of App::Switch
+__PACKAGE__->meta->make_immutable;
