@@ -5,6 +5,7 @@ use strict;
 
 use DateTime;
 use DateTime::Duration;
+use Clock;
 
 use Moose;
 
@@ -35,12 +36,28 @@ has 'accum_times' => (
 sub switch_to {
   my ($self, $name) = @_;
   my $time = $self->clock->time;
+  
+  unless( $self->_currently_off() ) {
+    $self->_accumulate_time($time);
+  }
+  $self->_record_switch($name, $time);
+}
+
+sub _currently_off {
+  my ($self) = @_;
+  return $self->switch_name eq "off";
+}
+
+sub _accumulate_time {
+  my ($self, $time) = @_;
   my $switch_time = $self->switch_time;
   my $switch_name = $self->switch_name;
-  unless( $switch_name eq 'off' ) {
-    $self->accum_times->{$switch_name} = DateTime::Duration->new() unless $self->accum_times->{$switch_name};
-    $self->accum_times->{$switch_name}->add( $time->delta_ms($switch_time) );
-  }
+  $self->accum_times->{$switch_name} = DateTime::Duration->new() unless $self->accum_times->{$switch_name};
+  $self->accum_times->{$switch_name}->add( $time->delta_ms($switch_time) );
+}
+
+sub _record_switch {
+  my ($self, $name, $time) = @_;
   $self->switch_name( $name );
   $self->switch_time( $time->clone() );
 }

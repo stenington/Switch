@@ -5,8 +5,52 @@ use warnings;
 
 use App::Switch;
 use Getopt::Long;
+use Pod::Usage;
 
 my $opts = {};
 GetOptions( $opts,
   "help",
 );
+
+pod2usage({
+  -message => "Help: ",
+  -exitval => 0,
+  -verbose => 1,
+}) if $opts->{help};
+
+pod2usage({
+  -message => "Please provide task name <name>.",
+  -exitval => 1,
+  -verbose => 1,
+}) if @ARGV < 1;
+pod2usage({
+  -message => "Please provide a single task name <name>.",
+  -exitval => 1,
+  -verbose => 1,
+}) if @ARGV > 1;
+my $name = $ARGV[0];
+
+my $app = App::Switch->new();
+$app->switch_to($name);
+
+__END__
+
+=head1 switch : minimal time-tracking
+
+  ,---,
+ /  '  \
+(- _/  -)  minimal time-tracking, because you have to
+ \  ,  /
+  '---'
+ 
+=head1 SYNOPSIS
+
+switch [--help] <name>
+
+  Arguments:
+    name      task identifier for time-tracking
+
+  Options:
+    help      displays this help message
+      
+

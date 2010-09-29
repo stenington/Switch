@@ -5,4 +5,4 @@ use warnings;
 
 use Test::More 'no_plan';
 
-ok( !system("bin/switch"), "exits cleanly" );
+ok( !system("bin/switch foo"), "exits cleanly" );

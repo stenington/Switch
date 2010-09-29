@@ -107,7 +107,8 @@ use ClockMock;
   $app->switch_to("bar");
   $clock->add_minutes(3);
   $app->switch_to("off");
-  is( $app->get_time_for("foo", "today"), "00:01", "one minute logged for foo" );
-  is( $app->get_time_for("bar", "today"), "00:03", "one minute logged for bar" );
+  is( $app->get_time_for("foo", "today"), "00:01", "foo time logged" );
+  is( $app->get_time_for("bar", "today"), "00:03", "bar time logged" );
 }
+
 
