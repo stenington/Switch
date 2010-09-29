@@ -67,6 +67,15 @@ sub get_time_for {
   return sprintf("%02d:%02d", $self->accum_times->{$name}->in_units('hours', 'minutes'));
 }
 
+sub get_timecard_for {
+  my ($self, $when) = @_;
+  my $timecard = "Timecard for $when:\n";
+  foreach my $name (keys %{$self->accum_times}) {
+    $timecard .= "  $name: " . $self->get_time_for( $name, $when ) . "\n";
+  }
+  return $timecard;
+}
+
 no Moose;
 
 __PACKAGE__->meta->make_immutable;

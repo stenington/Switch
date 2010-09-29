@@ -10,6 +10,7 @@ use Pod::Usage;
 my $opts = {};
 GetOptions( $opts,
   "help",
+  "timecard=s",
 );
 
 pod2usage({
@@ -18,20 +19,26 @@ pod2usage({
   -verbose => 1,
 }) if $opts->{help};
 
-pod2usage({
-  -message => "Please provide task name <name>.",
-  -exitval => 1,
-  -verbose => 1,
-}) if @ARGV < 1;
-pod2usage({
-  -message => "Please provide a single task name <name>.",
-  -exitval => 1,
-  -verbose => 1,
-}) if @ARGV > 1;
-my $name = $ARGV[0];
-
 my $app = App::Switch->new();
-$app->switch_to($name);
+
+if( $opts->{timecard} ){
+  print $app->get_timecard_for( $opts->{timecard} );
+}
+else {
+  pod2usage({
+    -message => "Please provide task name <name>.",
+    -exitval => 1,
+    -verbose => 1,
+  }) if @ARGV < 1;
+  pod2usage({
+    -message => "Please provide a single task name <name>.",
+    -exitval => 1,
+    -verbose => 1,
+  }) if @ARGV > 1;
+  my $name = $ARGV[0];
+
+  $app->switch_to($name);
+}
 
 __END__
 

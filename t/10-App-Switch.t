@@ -111,4 +111,20 @@ use ClockMock;
   is( $app->get_time_for("bar", "today"), "00:03", "bar time logged" );
 }
 
-
+# timecard
+{
+  my $app = App::Switch->new();
+  my $clock = ClockMock->new();
+  $app->set_clock($clock);
+  $app->switch_to("foo");
+  $clock->add_minutes(1);
+  $app->switch_to("bar");
+  $clock->add_minutes(3);
+  $app->switch_to("off");
+  my $expected =<<END;
+Timecard for today:
+  bar: 00:03
+  foo: 00:01
+END
+  is( $app->get_timecard_for( "today" ), $expected, "today's timecard" );
+}

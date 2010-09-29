@@ -5,4 +5,17 @@ use warnings;
 
 use Test::More 'no_plan';
 
-ok( !system("bin/switch foo"), "exits cleanly" );
+# sanity check basic call
+{
+  ok( !system("bin/switch foo"), "exits cleanly" );
+}
+
+# data persists between calls
+{
+  `bin/switch foo`;
+  `bin/switch off`;
+  my $lines = `bin/switch --timecard today`;
+  like( $lines, qr/Timecard for today.*foo:/, "timecard contains foo" );
+}
+
+#
