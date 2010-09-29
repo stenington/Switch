@@ -26,25 +26,28 @@ has 'switch_name' => (
   default => 'off',
 );
 
-has 'accum_time' => (
+has 'accum_times' => (
   is => 'rw',
-  isa => 'DateTime::Duration',
-  default => sub{ DateTime::Duration->new() },
+  isa => 'HashRef[DateTime::Duration]',
+  default => sub{ {}; },
 );
 
 sub switch_to {
   my ($self, $name) = @_;
   my $time = $self->clock->time;
   my $switch_time = $self->switch_time;
-  if( $name eq 'off' ) {
-    $self->accum_time->add( $time->delta_ms($switch_time) );
+  my $switch_name = $self->switch_name;
+  unless( $switch_name eq 'off' ) {
+    $self->accum_times->{$switch_name} = DateTime::Duration->new() unless $self->accum_times->{$switch_name};
+    $self->accum_times->{$switch_name}->add( $time->delta_ms($switch_time) );
   }
+  $self->switch_name( $name );
   $self->switch_time( $time->clone() );
 }
 
 sub get_time_for {
   my ($self, $name, $when) = @_;
-  return sprintf("%02d:%02d", $self->accum_time->in_units('hours', 'minutes'));
+  return sprintf("%02d:%02d", $self->accum_times->{$name}->in_units('hours', 'minutes'));
 }
 
 no Moose;
