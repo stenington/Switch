@@ -17,20 +17,6 @@ perldoc command.
 
     perldoc App::Switch
 
-You can also look for information at:
-
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Switch
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/App-Switch
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/App-Switch
-
-    Search CPAN
-        http://search.cpan.org/dist/App-Switch/
-
 
 LICENSE AND COPYRIGHT
 
