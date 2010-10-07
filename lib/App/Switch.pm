@@ -6,6 +6,7 @@ use strict;
 use DateTime;
 use DateTime::Duration;
 use Clock;
+use App::Switch::SwitchLog;
 
 use Moose;
 
@@ -27,10 +28,10 @@ has 'switch_name' => (
   default => 'off',
 );
 
-has 'accum_times' => (
-  is => 'rw',
-  isa => 'HashRef[DateTime::Duration]',
-  default => sub{ {}; },
+has 'switch_log' => (
+  is => 'ro',
+  isa => 'App::Switch::SwitchLog',
+  default => sub{ App::Switch::SwitchLog->new(); },
 );
 
 sub switch_to {
@@ -52,8 +53,7 @@ sub _accumulate_time {
   my ($self, $time) = @_;
   my $switch_time = $self->switch_time;
   my $switch_name = $self->switch_name;
-  $self->accum_times->{$switch_name} = DateTime::Duration->new() unless $self->accum_times->{$switch_name};
-  $self->accum_times->{$switch_name}->add( $time->delta_ms($switch_time) );
+  $self->switch_log->add( $time->delta_ms($switch_time), $switch_name );
 }
 
 sub _record_switch {
@@ -64,13 +64,13 @@ sub _record_switch {
 
 sub get_time_for {
   my ($self, $name, $when) = @_;
-  return sprintf("%02d:%02d", $self->accum_times->{$name}->in_units('hours', 'minutes'));
+  return $self->switch_log->time_for($name);
 }
 
 sub get_timecard_for {
   my ($self, $when) = @_;
   my $timecard = "Timecard for $when:\n";
-  foreach my $name (keys %{$self->accum_times}) {
+  foreach my $name (@{$self->switch_log->project_names}) {
     $timecard .= "  $name: " . $self->get_time_for( $name, $when ) . "\n";
   }
   return $timecard;

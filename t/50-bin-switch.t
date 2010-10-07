@@ -11,7 +11,8 @@ use Test::More 'no_plan';
 }
 
 # data persists between calls
-{
+sub dontdofornow {
+  unlink "./switch.dat";
   `bin/switch foo`;
   `bin/switch off`;
   my $lines = `bin/switch --timecard today`;
